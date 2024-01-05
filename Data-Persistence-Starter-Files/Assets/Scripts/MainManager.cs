@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,21 +9,28 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HiScoreText;
     public GameObject GameOverText;
-    
+
     private bool m_Started = false;
-    private int m_Points;
-    
+    public static int m_Points;
+    public int HiScore;
+    public string PlayerName;
+    public string LastPlayerName;
+
+
     private bool m_GameOver = false;
 
-    
+
+
     // Start is called before the first frame update
     void Start()
     {
+        LoadHiScore();
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -48,9 +53,12 @@ public class MainManager : MonoBehaviour
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
                 forceDir.Normalize();
-
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
+
+                // Reset current score when game starts
+                m_Points = 0;
+                ScoreText.text = $"Score : {m_Points}";
             }
         }
         else if (m_GameOver)
@@ -58,6 +66,7 @@ public class MainManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                LoadHiScore();
             }
         }
     }
@@ -66,7 +75,34 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        // Update HiScore whenever points are added
+        if (m_Points >= HiScore)
+        {
+            HiScore = m_Points;
+            LastPlayerName = PlayerName;
+            WriteHiScore();
+        }
     }
+
+    void LoadHiScore()
+    {
+        MenuUIManager.Instance.LoadData();
+        HiScore = MenuUIManager.Instance.HiScore;
+        PlayerName = MenuUIManager.Instance.PlayerName;
+        LastPlayerName = MenuUIManager.Instance.LastPlayerName;
+        HiScoreText.text = $"Hi Score : {LastPlayerName} : {HiScore}";
+    }
+
+    void WriteHiScore()
+    {
+        MenuUIManager.Instance.HiScore = HiScore;
+        MenuUIManager.Instance.PlayerName = PlayerName;
+        MenuUIManager.Instance.LastPlayerName = LastPlayerName;
+        HiScoreText.text = $"Hi Score : {LastPlayerName} : {HiScore}";
+        MenuUIManager.Instance.SaveData();
+    }
+
 
     public void GameOver()
     {

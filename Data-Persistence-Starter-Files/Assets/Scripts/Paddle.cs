@@ -1,16 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Paddle : MonoBehaviour
 {
     public float Speed = 2.0f;
+
+    /* Unmerged change from project 'Assembly-CSharp.Player'
+    Before:
+        public float MaxMovement = 2.0f;
+
+        // Start is called before the first frame update
+    After:
+        public float MaxMovement = 2.0f;
+
+        // Start is called before the first frame update
+    */
     public float MaxMovement = 2.0f;
-    
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
